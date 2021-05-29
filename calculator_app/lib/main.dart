@@ -1,5 +1,6 @@
 import 'package:calculator_app/button.dart';
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 void main() {
   runApp(MyApp());
@@ -20,9 +21,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  //variables to store user inputs and answer
   var userquestion = "";
   var useranswer = "";
 
+  //Button list
   final List<String> buttons = [
     "C",
     "Del",
@@ -88,17 +91,22 @@ class _MyHomePageState extends State<MyHomePage> {
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 4),
                     itemBuilder: (BuildContext context, int index) {
+                      
+                      //Clear button
                       if (index == 0) {
                         return Mybutton(
                           buttunTaped: () {
                             setState(() {
                               userquestion = "";
+                              useranswer = "";
                             });
                           },
                           buttontext: buttons[index],
                           color: Colors.blueGrey[100],
                           textcolor: Colors.grey[850],
                         );
+                        
+                        //Delete button
                       } else if (index == 1) {
                         return Mybutton(
                           buttunTaped: () {
@@ -111,7 +119,36 @@ class _MyHomePageState extends State<MyHomePage> {
                           color: Colors.blueGrey[300],
                           textcolor: Colors.grey[850],
                         );
-                      } else {
+                        
+                        // Equel button
+                      } else if (index == buttons.length - 1) {
+                        return Mybutton(
+                          buttunTaped: () {
+                            setState(() {
+                              equalMethod();
+                            });
+                          },
+                          buttontext: buttons[index],
+                          color: Colors.grey[850],
+                          textcolor: Colors.grey[350],
+                        );
+                       
+                        //Answer button
+                      } else if (index == buttons.length - 2) {
+                        return Mybutton(
+                          buttunTaped: () {
+                            setState(() {
+                              equalMethod();
+                            });
+                          },
+                          buttontext: buttons[index],
+                          color: Colors.grey[350],
+                          textcolor: Colors.grey[850],
+                        );
+                      }
+                      
+                      //Colored functional buttons
+                      else {
                         return Mybutton(
                           buttunTaped: () {
                             setState(() {
@@ -134,10 +171,24 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  //Return true if the button is a one of {%,x,/,-,+}
   bool isOperator(String x) {
     if (x == "%" || x == "x" || x == "/" || x == "-" || x == "+" || x == "=") {
       return true;
     }
     return false;
+  }
+
+  //calculation using math_expression 
+  void equalMethod() {
+    String finaluserinput = userquestion;
+    finaluserinput = finaluserinput.replaceAll('x', '*');
+
+    Parser p = Parser();
+    Expression exp = p.parse(finaluserinput);
+    ContextModel cm = ContextModel();
+    double eval = exp.evaluate(EvaluationType.REAL, cm);
+
+    useranswer = eval.toString();
   }
 }
